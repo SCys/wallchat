@@ -16,4 +16,6 @@ jobs:
     - uses: actions/checkout@v3
     - name: Build the Docker image
       run: |
-        docker build . --file Dockerfile --tag scys/wallchat:$(date +%s) --tag scys/wallchat:latest
+        docker build . --file Dockerfile --tag scys/wallchat:latest
+        docker login --user ${{ secrets.DOCKER_USER }} --password ${{ secrets.DOCKER_TOKEN }}
+        docker push --tag scys/wallchat:latest
