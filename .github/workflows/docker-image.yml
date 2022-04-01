@@ -21,6 +21,6 @@ jobs:
     - name: Build the Docker image
       run: |
         docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_TOKEN }}
-        docker pull $IMAGE_TAG
+        docker pull $IMAGE_TAG || echo "no cached image"
         docker build . --file Dockerfile --tag $IMAGE_TAG
         docker push $IMAGE_TAG
