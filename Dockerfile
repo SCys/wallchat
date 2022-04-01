@@ -13,7 +13,7 @@ RUN apt-get update -q && apt-get -qy install \
     libnss3 libgbm-dev libxshmfence-dev \
     git ffmpeg
 
-RUN git clone --depth 1 https://github.com/UnsignedInt8/leavexchat-bot.git && cd leavexchat-bot && \
+RUN git clone --depth 1 https://github.com/scys/wallchat.git && cd wallchat && \
     yarn && yarn build && yarn global add forever
 
 RUN mv leavexchat-bot/* /data && rm -rf /data/leavexchat-bot
