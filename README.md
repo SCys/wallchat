@@ -1,5 +1,9 @@
 # WallChat
 
+[![Docker Image CI](https://github.com/SCys/wallchat/actions/workflows/docker-image.yml/badge.svg)](https://github.com/SCys/wallchat/actions/workflows/docker-image.yml)
+
+[![Docker Image Size](https://badgen.net/docker/size/tscys/wallchat?icon=docker&label=image%20size)](https://hub.docker.com/r/scys/wallchat/)
+
 [![Powered by Wechaty](https://img.shields.io/badge/Powered%20By-Wechaty-blue.svg)](https://github.com/Wechaty/wechaty)
 
 使用 Telegram Bot 收发 WeChat 文字、语音、图片、视频、Telegram 静态贴纸等消息
