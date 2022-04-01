@@ -2,7 +2,7 @@
 
 [![Docker Image CI](https://github.com/SCys/wallchat/actions/workflows/docker-image.yml/badge.svg)](https://github.com/SCys/wallchat/actions/workflows/docker-image.yml)
 
-[![Docker Image Size](https://badgen.net/docker/size/tscys/wallchat?icon=docker&label=image%20size)](https://hub.docker.com/r/scys/wallchat/)
+[![Docker Image Size](https://badgen.net/docker/size/scys/wallchat?icon=docker&label=image%20size)](https://hub.docker.com/r/scys/wallchat/)
 
 [![Powered by Wechaty](https://img.shields.io/badge/Powered%20By-Wechaty-blue.svg)](https://github.com/Wechaty/wechaty)
 
