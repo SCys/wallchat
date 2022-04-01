@@ -16,6 +16,6 @@ RUN apt-get update -q && apt-get -qy install \
 RUN git clone --depth 1 https://github.com/scys/wallchat.git && cd wallchat && \
     yarn && yarn build && yarn global add forever
 
-RUN mv leavexchat-bot/* /data && rm -rf /data/leavexchat-bot
+RUN mv wallchat/* /data && rm -rf /data/wallchat && mkdir data
 
 ENTRYPOINT ["forever", "build/main/index.js", "-c", "config.json"]
