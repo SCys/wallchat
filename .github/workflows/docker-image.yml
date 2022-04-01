@@ -15,4 +15,5 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag scys/wallchat:$(date +%s) --tag scys/wallchat:latest
+      run: |
+        docker build . --file Dockerfile --tag scys/wallchat:$(date +%s) --tag scys/wallchat:latest
