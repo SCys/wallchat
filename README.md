@@ -6,6 +6,13 @@
 
 [![Powered by Wechaty](https://img.shields.io/badge/Powered%20By-Wechaty-blue.svg)](https://github.com/Wechaty/wechaty)
 
+## 修改
+
++ 增加了 Dockerfile
++ 增加了 GitHub Actions 的构建脚本
+
+## 原稿
+
 使用 Telegram Bot 收发 WeChat 文字、语音、图片、视频、Telegram 静态贴纸等消息
 
 ## 安装准备
