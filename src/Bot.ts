@@ -355,7 +355,7 @@ export default class Bot {
     let wechat =
       this.recoverWechats.get(chatid) ||
       WechatyBuilder.build({
-        name: `telegram_${chatid})}`,
+        name: `data/telegram_${chatid}`,
         puppet: 'wechaty-puppet-wechat',
       });
 
@@ -528,7 +528,7 @@ export default class Bot {
     try {
       this.clients.delete(ctx.chat.id);
       user.wechat?.reset();
-    } catch (error) {}
+    } catch (error) { }
 
     await user.wechat?.logout().catch((reason) => Logger.error(reason));
     await user.wechat?.stop().catch((reason) => Logger.error(reason));
