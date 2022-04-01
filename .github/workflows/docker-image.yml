@@ -23,4 +23,4 @@ jobs:
         docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_TOKEN }}
         docker pull $IMAGE_TAG
         docker build . --file Dockerfile --tag $IMAGE_TAG
-        docker push --tag $IMAGE_TAG
+        docker push $IMAGE_TAG
