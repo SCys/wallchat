@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [ master ]
 
-env:
-  IMAGE_TAG: scys/wallchat:latest
-
 jobs:
 
   build:
@@ -46,5 +43,5 @@ jobs:
         platforms: linux/arm64, linux/amd64
         push: true
         tags: |
-          $IMAGE_TAG:latest
-          $IMAGE_TAG:${{steps.version.outputs.date_version}}
+          scys/wallchat:latest
+          scys/wallchat:${{steps.version.outputs.date_version}}
