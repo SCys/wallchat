@@ -18,6 +18,7 @@ RUN apt-get update -q && apt-get -qy install --no-install-recommends \
 
 ADD . /data/
 
-RUN yarn && yarn build && yarn global add forever && mkdir mkdir 
+#RUN yarn && yarn build && yarn global add forever && mkdir data
+RUN npm i && npm run build && npm i -g forever && mkdir data
 
 ENTRYPOINT ["forever", "build/main/index.js", "-c", "config.json"]
