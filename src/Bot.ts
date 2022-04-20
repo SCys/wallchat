@@ -357,6 +357,12 @@ export default class Bot {
       WechatyBuilder.build({
         name: `data/telegram_${chatid}`,
         puppet: 'wechaty-puppet-wechat',
+        puppetOptions: {
+          launchOptions: {
+            executablePath: '/usr/bin/chromium',
+            // ... others launchOptions, see: https://github.com/GoogleChrome/puppeteer/blob/v1.18.1/docs/api.md#puppeteerlaunchoptions
+          }
+        }
       });
 
     let client: Client = {
