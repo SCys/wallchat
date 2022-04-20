@@ -11,7 +11,8 @@ RUN apt-get update -q && apt-get -qy install \
     libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 \
     libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 \
     libnss3 libgbm-dev libxshmfence-dev \
-    git ffmpeg
+    git ffmpeg \
+    chromium
 
 RUN git clone --depth 1 https://github.com/scys/wallchat.git && cd wallchat && \
     yarn && yarn build && yarn global add forever
