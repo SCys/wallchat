@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@3
+    - uses: actions/checkout@v3
         
     - name: Modify scripts and get version
       id: version
