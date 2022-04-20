@@ -25,6 +25,8 @@ jobs:
       uses: docker/setup-buildx-action@v1
 
     - name: Build the Docker image
+      env:
+        PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
       run: |
         docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_TOKEN }}
         docker pull $IMAGE_TAG || echo "no cached image" 
