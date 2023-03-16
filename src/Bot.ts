@@ -367,6 +367,7 @@ export default class Bot {
         name: `data/telegram_${chatid}`,
         puppet: 'wechaty-puppet-wechat',
         puppetOptions: {
+          uos: true,  // 开启uos协议
           launchOptions: {
             executablePath: '/usr/bin/chromium',
             // ... others launchOptions, see: https://github.com/GoogleChrome/puppeteer/blob/v1.18.1/docs/api.md#puppeteerlaunchoptions
