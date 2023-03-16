@@ -8,7 +8,7 @@ export default async (ctx: Context) => {
   const msg = ctx.message as Message.TextMessage;
   if (!msg) return;
 
-  const id = ctx.chat.id;
+  const id = ctx?.chat?.id;
   const user = ctx['user'] as Client;
 
   let contents = msg.text.split(' ');
@@ -17,19 +17,20 @@ export default async (ctx: Context) => {
   let name = contents.reduce((p, c) => `${p} ${c}`, '').trim();
 
   if (name) {
-    const index = user.muteList.indexOf(name);
+    user.muteList = user.muteList.filter((i) => i !== name);
+    user.soundOnlyList = user.soundOnlyList.filter((i) => i !== name);
 
-    if (index === -1) {
-      await ctx.reply(lang.message.contactNotFound);
-      return;
-    }
-
-    user.muteList.splice(index, 1);
     await ctx.reply(lang.message.unmuteRoom(name));
   } else {
     await ctx.reply(lang.message.unmuteRoom(user.muteList));
     user.muteList = [];
+    user.soundOnlyList = [];
+    user.nameOnlyList = {};
   }
 
-  await writeFile(`${user.botId}${id}`, { muteList: user.muteList });
+  await writeFile(`${user.botId}${id}`, {
+    muteList: user.muteList,
+    soundOnly: user.soundOnlyList,
+    namesOnly: user.nameOnlyList,
+  });
 };

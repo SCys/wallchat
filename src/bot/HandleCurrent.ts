@@ -6,18 +6,17 @@ import lang from '../strings';
 
 export default async (ctx: Context) => {
   let user = ctx['user'] as Client;
-  if (!user.currentContact) {
+  if (!user?.currentContact) {
     ctx.reply(lang.message.noCurrentContact);
     return;
   }
 
   let name = '';
 
-  const alias = (await (user.currentContact as Contact)['alias']?.()) ?? '';
+  const alias = (await (user.currentContact as Contact)?.['alias']?.()) ?? '';
   name =
-    (user.currentContact as Contact)['name']?.() ||
-    (await (user.currentContact as Room)['topic']?.()) ||
-    '';
+    (user.currentContact as Contact)?.['name']?.() ||
+    (await (user.currentContact as Room)?.['topic']?.());
 
   name = alias ? `${name} (${alias})` : name;
 

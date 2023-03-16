@@ -19,6 +19,8 @@ import {
   handleForwardTo,
   handleLock,
   handleMute,
+  handleNameOnly,
+  handleSoundOnly,
   handleTelegramMessage,
   handleUnlock,
   handleUnmute,
@@ -46,6 +48,7 @@ dayjs.extend(relativeTime);
 export interface BotOptions {
   token: string;
   padplusToken?: string;
+  allows?: number[];
   socks5Proxy?: {
     host: string;
     port: number;
@@ -74,6 +77,8 @@ export interface Client {
   botId: string;
   firstMsgId?: any;
   muteList: string[];
+  soundOnlyList: string[];
+  nameOnlyList: { [group: string]: string[] };
 }
 
 export default class Bot {
@@ -185,13 +190,15 @@ export default class Bot {
       this.handleFind,
       this.handleLock
     );
-    this.bot.command('current', checkUser, this.handleCurrent);
+    this.bot.command('current', this.handleCurrent);
     this.bot.command('agree', checkUser, this.handleAgreeFriendship);
     this.bot.command('disagree', checkUser, this.handleDisagreeFriendship);
     this.bot.command('acceptroom', checkUser);
     this.bot.command('forward', checkUser, this.handleForward);
     this.bot.command('forwardto', checkUser, this.handleForward);
     this.bot.command('mute', checkUser, this.handleMute);
+    this.bot.command('soundonly', checkUser, this.handleSoundOnly);
+    this.bot.command('nameonly', checkUser, this.handleNameOnly);
     this.bot.command('unmute', checkUser, this.handleUnmute);
     this.bot.command('quitroom', checkUser, this.handleQuitRoom);
     this.bot.command('logout', checkUser, this.handleLogout);
@@ -232,7 +239,7 @@ export default class Bot {
     if (this.options.silent) return;
 
     const alert = HTMLTemplates.message({
-      nickname: `[Bot Alert]`,
+      nickname: '[Bot Alert]',
       message: msg,
     });
 
@@ -250,7 +257,7 @@ export default class Bot {
 
     await this.bot.launch();
     this.botSelf = await this.bot.telegram.getMe();
-    Logger.info(`Bot is running`);
+    Logger.info('Bot is running');
 
     await this.recoverSessions();
   }
@@ -285,7 +292,7 @@ export default class Bot {
           });
 
           const lastDump = await readFile(`${this.id}${chatid}`);
-          if (lastDump.recentContact && lastDump.recentContact.name) {
+          if (lastDump.recentContact?.name) {
             const { found, foundName } = await findContact(
               lastDump.recentContact.name,
               wechat
@@ -305,6 +312,8 @@ export default class Bot {
           }
 
           client.muteList = lastDump.muteList || [];
+          client.soundOnlyList = lastDump.soundOnly || [];
+          client.nameOnlyList = lastDump.namesOnly || {};
 
           this.recoverWechats.delete(chatid);
         });
@@ -316,7 +325,7 @@ export default class Bot {
           this.recoverWechats.delete(chatid);
 
           const alert = HTMLTemplates.message({
-            nickname: `[Bot Alert]`,
+            nickname: '[Bot Alert]',
             message: lang.login.sessionLost,
           });
 
@@ -371,6 +380,8 @@ export default class Bot {
       receiveGroups: true,
       receiveOfficialAccount: true,
       muteList: [],
+      soundOnlyList: [],
+      nameOnlyList: {},
       botId: this.id,
     };
 
@@ -384,12 +395,16 @@ export default class Bot {
       if (!(await c(ctx))) return;
     }
 
-    const id = ctx.chat.id;
+    if (!this.options.allows?.includes(ctx.message.chat.id) ?? true) {
+      return ctx.reply(lang.nowelcome);
+    }
+
+    const id = ctx?.chat?.id;
     let qrcodeCache = '';
     if (this.clients.has(id) && this.clients.get(id)?.initialized) {
       let user = this.clients.get(id);
       if (user.wechatId) {
-        ctx.reply(lang.login.logined(user.wechat.ContactSelf.name));
+        ctx.reply(lang.login.logined(user.wechat.name?.() || ''));
         return;
       }
 
@@ -519,8 +534,8 @@ export default class Bot {
 
     if (!ctx) return next ? next() : undefined;
 
-    let id = ctx.chat.id;
-    let user = this.clients.get(id);
+    let id = ctx?.chat?.id;
+    let user = this.clients?.get(id);
     if (!user) return;
 
     ctx['user'] = user;
@@ -532,7 +547,7 @@ export default class Bot {
     if (!user) return;
 
     try {
-      this.clients.delete(ctx.chat.id);
+      this.clients.delete(ctx?.chat?.id);
       user.wechat?.reset();
     } catch (error) { }
 
@@ -594,8 +609,10 @@ export default class Bot {
   protected handleLock = (ctx: Context) => handleLock(ctx);
   protected handleUnlock = (ctx: Context) => handleUnlock(ctx);
   protected handleMute = (ctx: Context) => handleMute(ctx);
+  protected handleSoundOnly = (ctx: Context) => handleSoundOnly(ctx);
+  protected handleNameOnly = (ctx: Context) => handleNameOnly(ctx);
   protected handleUnmute = (ctx: Context) => handleUnmute(ctx);
-  protected handleCurrent = handleCurrent;
+  protected handleCurrent = (ctx: Context) => handleCurrent(ctx);
   protected handleForward = handleForwardTo;
   protected handleTelegramMessage = (ctx: Context) =>
     handleTelegramMessage(ctx, { ...this.options, bot: this.botSelf });

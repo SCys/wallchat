@@ -31,9 +31,9 @@ export default async (self: Bot, ctx: Context, next: Function) => {
   let info = user.contactLocked
     ? ` [${lang.message.contactLocked('').trim()}]`
     : '';
-  let sent = await ctx
-    .reply(lang.message.contactFound(`${foundName}`) + info)
-    .catch();
+
+  let sent = await ctx.reply(lang.message.contactFound(`${foundName}`) + info);
+
   user.currentContact = found;
 
   user.msgs.set(sent.message_id, { contact: found, wxmsg: undefined });
@@ -41,7 +41,7 @@ export default async (self: Bot, ctx: Context, next: Function) => {
   const wname =
     (found as Contact)['name']?.() || (await (found as Room)['topic']?.());
 
-  await writeFile(`${self.id}${ctx.chat.id}`, {
+  await writeFile(`${self.id}${ctx?.chat?.id}`, {
     recentContact: { name: wname, locked: user.contactLocked },
   });
 

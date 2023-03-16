@@ -22,15 +22,15 @@ export default async (ctx: Context) => {
 
   const room = wxmsg?.room() ?? user.currentContact;
 
-  const topic =
+  const name =
     (await (room as Room)['topic']?.()) || (room as Contact)['name']?.();
 
-  if (user.muteList.includes(topic)) {
-    await ctx.reply(lang.message.muteRoom(topic));
+  if (user.soundOnlyList.includes(name)) {
+    await ctx.reply(lang.message.soundOnlyRoom(name));
     return;
   }
 
-  user.muteList.push(topic);
-  await ctx.reply(lang.message.muteRoom(topic));
-  await writeFile(`${user.botId}${id}`, { muteList: user.muteList });
+  user.soundOnlyList.push(name);
+  await ctx.reply(lang.message.soundOnlyRoom(name));
+  await writeFile(`${user.botId}${id}`, { soundOnly: user.soundOnlyList });
 };

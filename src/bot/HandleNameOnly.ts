@@ -20,17 +20,24 @@ export default async (ctx: Context) => {
   const id = ctx?.chat?.id;
   const wxmsg = user.msgs.get(msg.reply_to_message?.message_id)?.wxmsg;
 
-  const room = wxmsg?.room() ?? user.currentContact;
+  const room = wxmsg?.room?.();
 
-  const topic =
-    (await (room as Room)['topic']?.()) || (room as Contact)['name']?.();
+  if (!room) return;
 
-  if (user.muteList.includes(topic)) {
-    await ctx.reply(lang.message.muteRoom(topic));
+  const topic = await room.topic();
+
+  const names = user.nameOnlyList[topic] || [];
+  const onlyUser = wxmsg.talker().name();
+
+  if (names.includes(onlyUser)) {
+    ctx.reply('OK');
     return;
   }
 
-  user.muteList.push(topic);
-  await ctx.reply(lang.message.muteRoom(topic));
-  await writeFile(`${user.botId}${id}`, { muteList: user.muteList });
+  names.push(onlyUser);
+
+  user.nameOnlyList[topic] = names;
+
+  await ctx.reply(lang.message.nameOnly(onlyUser));
+  await writeFile(`${user.botId}${id}`, { namesOnly: user.nameOnlyList });
 };

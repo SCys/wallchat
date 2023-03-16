@@ -1,5 +1,6 @@
 import * as TT from 'telegraf/typings/telegram-types';
 import * as XMLParser from '../lib/XmlParser';
+import * as fs from 'fs/promises';
 
 import { Contact, Message } from 'wechaty';
 import {
@@ -12,10 +13,13 @@ import { CommonMessageBundle } from 'telegraf/typings/core/types/typegram';
 import { Context } from 'telegraf/typings/context';
 import HTMLTemplates from '../lib/HTMLTemplates';
 import Logger from '../lib/Logger';
+import ce from 'command-exists';
 import { decode } from 'html-entities';
 import download from 'download';
+import ffmpeg from 'fluent-ffmpeg';
 import isGif from 'is-gif';
 import lang from '../strings';
+import tempfile from 'tempfile';
 import { types } from 'wechaty-puppet';
 // import prism from 'prism-media';
 import { writeFile } from './UpdateTmpFile';
@@ -38,18 +42,26 @@ const banNotifications = [
   '" 拍了拍自己',
   '确认了一笔转账，当前微信版本不支持展示该内容',
   '向他人发起了一笔转账，当前微信版本不支持展示该内容',
+  '与群里其他人都不是朋友关系，请注意隐私安全'
 ];
 
 export default async (self: Bot, msg: Message, ctx: Context) => {
-  let id = ctx.chat.id;
+  let id = ctx?.chat?.id;
   let user = self.clients.get(id);
 
   let from = msg.talker();
   let room = msg.room();
+  let topic = '';
+
+  let isRoomSoundOnly = false;
 
   if (room) {
-    const topic = await room.topic();
-    if (user.muteList.includes(topic)) return;
+    topic = await room.topic();
+    const isRoomMuted = user.muteList.includes(topic);
+
+    isRoomSoundOnly = user.soundOnlyList.includes(topic);
+
+    if (isRoomMuted) return;
   }
 
   let type = msg.type() as any;
@@ -64,14 +76,6 @@ export default async (self: Bot, msg: Message, ctx: Context) => {
   if (!user.receiveGroups && room) return;
 
   let alias = await from.alias();
-
-  // if (self.muteList.includes(from.name())) {
-  //   return;
-  // }
-
-  // if (alias && self.muteList.includes(alias)) {
-  //   return;
-  // }
 
   let nickname = from.name() + (alias ? ` (${alias})` : '');
   nickname = nickname + (room ? ` [${await room.topic()}]` : '');
@@ -91,6 +95,14 @@ export default async (self: Bot, msg: Message, ctx: Context) => {
     await handleFriendApplyingXml(text, ctx);
     return;
   }
+
+  if (room && isRoomSoundOnly && type !== MessageType.Audio) return;
+  if (
+    room &&
+    user.nameOnlyList[topic]?.length > 0 &&
+    !user.nameOnlyList[topic]?.includes(from.name())
+  )
+    return;
 
   switch (type) {
     case MessageType.Text:
@@ -156,15 +168,34 @@ export default async (self: Bot, msg: Message, ctx: Context) => {
     case MessageType.Image:
       let image = await msg.toFileBox();
 
-      if (image.mediaType === 'image/gif') {
-        const buffer = await image.toBuffer();
-        if (isGif(buffer)) {
-          sent = await ctx.replyWithAnimation(
-            { source: buffer },
-            { caption: `${nickname}` }
+      const buffer = await image.toBuffer();
+
+      if (isGif(buffer)) {
+        if (ce.sync('ffmpeg')) {
+          const gifTmpPath = tempfile('.gif');
+          const gifMp4TmpPath = tempfile('.mp4');
+
+          await image.toFile(gifTmpPath, true);
+
+          await new Promise<void>((resolve) => {
+            ffmpeg(gifTmpPath)
+              .noAudio()
+              .output(gifMp4TmpPath)
+              .on('error', (e) => console.log(e))
+              .on('end', () => resolve())
+              .run();
+          });
+
+          sent = await ctx.replyWithVideo(
+            { source: gifMp4TmpPath },
+            { caption: nickname }
           );
-          break;
+
+          fs.unlink(gifTmpPath);
+          fs.unlink(gifMp4TmpPath);
         }
+
+        break;
       }
 
       sent = await ctx.replyWithPhoto(
