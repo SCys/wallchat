@@ -4,7 +4,7 @@ FROM node:16-bullseye
 
 WORKDIR /data/
 
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
+#ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
 RUN apt-get update -q && apt-get -qy install --no-install-recommends \
     libasound2 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 \
@@ -13,7 +13,6 @@ RUN apt-get update -q && apt-get -qy install --no-install-recommends \
     libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 \
     libnss3 libgbm-dev libxshmfence-dev \
     git ffmpeg \
-    chromium \
     && rm -rf /var/lib/apt/lists/*
 
 ADD . /data/
