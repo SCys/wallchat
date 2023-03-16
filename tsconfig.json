@@ -39,7 +39,10 @@
 
     "lib": ["es2017"],
     "types": ["node"],
-    "typeRoots": ["node_modules/@types", "src/types"]
+    "typeRoots": ["node_modules/@types", "src/types"],
+      
+    // https://stackoverflow.com/questions/70279384/why-does-tsc-command-emit-an-error-even-though-vite-command-works
+    "skipLibCheck": true
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules/**"],
